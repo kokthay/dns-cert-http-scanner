@@ -5,8 +5,8 @@ cd /home/test/zdns && sudo docker compose build scanner && (
     --input /work/domains.txt \
     --output /work/results \
     --with-ns-ips \
-    --threads 512 --go-processes 4 \
-    --validation-workers 128 \
+    --threads 369 --go-processes 4 \
+    --validation-workers 99 \
     --timeout 40 --validation-timeout 40 \
     || scan_status=$?
 
@@ -15,7 +15,7 @@ cd /home/test/zdns && sudo docker compose build scanner && (
       --output /work/results \
       --public-ns \
       --include-nxdomain \
-      --threads 512 --go-processes 4 \
+      --threads 369 --go-processes 4 \
       --timeout 40 \
     && sudo python3 ./extract_ip_records.py \
       ./results/domains \
@@ -28,7 +28,7 @@ cd /home/test/zdns && sudo docker compose build scanner && (
       --failures-output /work/results/failures_certHTTP \
       --workers 400 \
       --rate 200 \
-      --timeout 20s
+      --timeout 60s
   else
     echo "Scanner stopped with exit code $scan_status; fallback not started."
     exit "$scan_status"
