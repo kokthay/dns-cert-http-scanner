@@ -1,0 +1,10 @@
+services:
+  scanner:
+    build: .
+    cpus: 4.0
+    # All files inside /work persist on the host.
+    volumes:
+      - /home/test/zdns:/work
+    command: ["--input", "/work/domains.txt", "--output", "/work/result",
+              "--threads", "8", "--go-processes", "2",
+              "--validation-workers", "2", "--per-ns-qps", "200"]
