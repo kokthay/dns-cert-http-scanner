@@ -300,3 +300,11 @@ authoring environment; actual container building/running was not executed here.
 
 References: https://pkg.go.dev/net/http, https://pkg.go.dev/crypto/tls, and
 https://docs.docker.com/engine/network/drivers/host/.
+## Optional Python fallback (HTTP/1.1, HTTP/2, HTTP/3)
+
+The Go scanner still tries HTTP/1.1 and HTTP/2. To retry incomplete collections
+with independent Python clients and HTTP/3, run the separate `cert-http-python`
+service **after** Go finishes. See [PYTHON_FALLBACK.md](PYTHON_FALLBACK.md) for
+commands, provenance, output files and UDP requirements. Successful results
+from either scanner are reused.
+

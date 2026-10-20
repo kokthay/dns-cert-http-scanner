@@ -1,4 +1,25 @@
-# v2 validation
+# Validation update — 2026-10-20
+
+- Go 1.26.1 on Linux/amd64: full `go test -race ./...` passed after adding
+  Python-success resume and `HTTP_PROTOCOL_ERROR` classification. Header-size
+  errors retain `HEADER_LIMIT` precedence.
+- Python 3.12.14: 16 local-only unit/integration tests passed with pinned
+  aioquic 1.7.0, h2 4.4.1 and h11 0.16.0.
+- Real local TCP/TLS HTTP/1.1, HTTP/2 and UDP/QUIC HTTP/3 endpoints tested;
+  the HTTP/3 test includes 103 followed by final 403 response headers.
+- Reproduced DATA-before-HEADERS on HTTP/2: certificate retained, final headers
+  absent, status HTTP_PROTOCOL_ERROR.
+- Tested expired/wrong-hostname certificates, full supplied chain, duplicate
+  headers, SNI/Host, no DNS, IPv6, ordered IP fallback, TCP-refused/UDP-success,
+  cached successes and failures, summaries, metadata errors, cancellation,
+  header limits, preservation of Go partial results and rejection of QUIC
+  preferred-address migration.
+- Python Dockerfile targets Python 3.13. Docker is unavailable in this
+  environment, so image builds and container execution remain untested here.
+  The Dockerfile itself runs the Python integration suite during build.
+- No public million-domain scan was run.
+
+## Previous v2 validation record
 
 Validated using Go 1.27.2 on Linux/amd64:
 

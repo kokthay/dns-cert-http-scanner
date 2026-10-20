@@ -17,6 +17,7 @@ import (
 )
 
 const profile = "https-direct-ip-fallback-v2"
+const pythonProfile = "https-python-fallback-v1"
 
 type Target struct {
 	Rank   int    `json:"rank"`
@@ -205,6 +206,9 @@ func classify(stage string, err error) string {
 	if strings.Contains(msg, "header list") && strings.Contains(msg, "large") || strings.Contains(msg, "response headers exceeded") || strings.Contains(msg, "response headers exceed") {
 		return "HEADER_LIMIT"
 	}
+	if strings.Contains(msg, "protocol_error") || strings.Contains(msg, "protocol error") {
+		return "HTTP_PROTOCOL_ERROR"
+	}
 	if stage == "tcp" {
 		return "CONNECTION_ERROR"
 	}
@@ -293,7 +297,8 @@ func loadCompleted(dir string, task DomainTask, c Config) (Endpoint, bool) {
 		return e, false
 	}
 	h := e.HTTP
-	if !h.Complete || h.Schema != profile || h.Rank != task.Rank || h.Domain != task.Domain || h.Port != c.Port || h.UserAgent != c.UserAgent || c.RetryFailed && !h.Success {
+	compatibleSchema := h.Schema == profile || h.Schema == pythonProfile && h.Success && h.Response != nil
+	if !h.Complete || !compatibleSchema || h.Rank != task.Rank || h.Domain != task.Domain || h.Port != c.Port || h.UserAgent != c.UserAgent || c.RetryFailed && !h.Success {
 		return e, false
 	}
 	if h.Success {

@@ -32,6 +32,30 @@ func testConfig() Config {
 	return Config{Workers: 3, Port: 443, Timeout: time.Second, ConnectTimeout: time.Second, TLSTimeout: time.Second, HeaderTimeout: time.Second, ProgressEvery: time.Hour, MaxHeaderBytes: 1024 * 1024, Resume: true, UserAgent: "ScannerTest/1.0"}
 }
 
+func TestPythonRecoveredHTTP3Resume(t *testing.T) {
+	c := testConfig()
+	target := Target{Rank: 1, IP: "127.0.0.1", Domain: "probe.invalid"}
+	task := DomainTask{Rank: 1, Domain: target.Domain, IPs: []string{target.IP}}
+	h := HTTPResult{Target: target, Schema: pythonProfile, Complete: true, Success: true,
+		Port: c.Port, UserAgent: c.UserAgent, CertificateCount: 1, Status: "OK",
+		Response: &Response{StatusCode: 403, Protocol: "HTTP/3"}}
+	tlsResult := TLSResult{Target: target, VerificationPerformed: false}
+	dir := targetDir(t.TempDir(), target)
+	if err := saveFiles(dir, h, tlsResult, []byte("test-leaf"), []byte("test-chain")); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := loadCompleted(dir, task, c); !ok {
+		t.Fatal("Python HTTP/3 collection must be reusable without reconnecting")
+	}
+	h.Success = false
+	if err := writeJSON(filepath.Join(dir, "http.json"), h); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := loadCompleted(dir, task, c); ok {
+		t.Fatal("Python failure must not replace Go retry behavior")
+	}
+}
+
 func testCertificate(t *testing.T) (tls.Certificate, *x509.CertPool) {
 	t.Helper()
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)

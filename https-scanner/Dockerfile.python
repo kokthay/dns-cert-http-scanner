@@ -1,0 +1,9 @@
+FROM python:3.13-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements-fallback.txt ./
+RUN pip install --no-cache-dir -r requirements-fallback.txt
+COPY fallback_http.py test_fallback_http.py ./
+RUN python -m unittest -q test_fallback_http
+WORKDIR /work
+ENTRYPOINT ["python3", "/app/fallback_http.py"]

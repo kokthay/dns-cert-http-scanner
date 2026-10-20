@@ -25,3 +25,32 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+
+  cert-http-python:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    image: cert-http-python:local
+    init: true
+    network_mode: host
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - type: bind
+        source: /home/test/zdns/results
+        target: /work/results
+    command:
+      - --input=/work/results/websites_ips.jsonl
+      - --output=/work/results/cert_http
+      - --failures-output=/work/results/failures_certHTTP
+      - --workers=50
+      - --rate=25
+      - --timeout=20s
+    stop_grace_period: 30s
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
