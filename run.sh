@@ -7,7 +7,7 @@ cd /home/test/zdns && sudo docker compose build scanner && (
     --with-ns-ips \
     --threads 351 --go-processes 4 \
     --validation-workers 90 \
-    --timeout 60 --validation-timeout 60 \
+    --timeout 40 --validation-timeout 40 \
     || scan_status=$?
 
   if [ "$scan_status" -le 1 ]; then
@@ -16,7 +16,7 @@ cd /home/test/zdns && sudo docker compose build scanner && (
       --public-ns \
       --include-nxdomain \
       --threads 351 --go-processes 4 \
-      --timeout 60 \
+      --timeout 40 \
     && sudo python3 ./extract_ip_records.py \
       ./results/domains \
       ./results/websites_ips.jsonl \
